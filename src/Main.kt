@@ -2,8 +2,7 @@ class EventManager(
     override val observerIterator: IObserverListCollection = IObserverListCollection(),
     val rulesMap: MutableMap<SmartThing, SmartThing>
 ) : IObservable {
-//    private fun findRuleForSmartThing(smartThing: SmartThing)
-
+    private fun findRuleForSmartThing(smartThing: SmartThing) = rulesMap.getValue(smartThing)
 
     override fun sendUpdateEvent(thingType: SmartThingType, place: HomePlace, state: State) {
         val iterator = observerIterator.createIterator()
@@ -17,14 +16,21 @@ class EventManager(
     }
 
     fun changeThingState(observerObject: IObserver) {
+        val chanableSmartThing = findRuleForSmartThing(
+            SmartThing(
+                type = observerObject.smartThingType,
+                place = observerObject.homePlace,
+                newState = null
+            )
+        )
         //find action to do
-        val objectType = SmartThingType.LIGHT
-        val objectPlace = HomePlace.SLEEPING_ROOM
-        val newState = State.ON
+//        val objectType = SmartThingType.LIGHT
+//        val objectPlace = HomePlace.SLEEPING_ROOM
+//        val newState = State.ON
         sendUpdateEvent(
-            thingType = objectType,
-            place = objectPlace,
-            state = newState
+            thingType = chanableSmartThing.type,
+            place = chanableSmartThing.place,
+            state = chanableSmartThing.newState!!
         )
     }
 }
@@ -34,8 +40,7 @@ fun main(args: Array<String>) {
         rulesMap = mutableMapOf(
             SmartThing(
                 type = SmartThingType.MOTION_SENSOR,
-                place = HomePlace.SLEEPING_ROOM,
-                newState = State.ON
+                place = HomePlace.SLEEPING_ROOM
             ) to SmartThing(
                 type = SmartThingType.LIGHT,
                 place = HomePlace.SLEEPING_ROOM,
